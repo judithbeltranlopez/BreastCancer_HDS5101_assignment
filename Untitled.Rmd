@@ -1,0 +1,38 @@
+---
+title: "Assignment HDS5101"
+author: "Judith Beltrán López, 25241070"
+date: "2026-03-05"
+output: html_document
+---
+
+
+```{r}
+## import ##
+
+## load data ##
+df <- read.csv("data/wdbc.data", header = FALSE)
+
+colnames(df) <- c(
+  "id", "diagnosis",
+  "radius_mean", "texture_mean", "perimeter_mean", "area_mean", "smoothness_mean",
+  "compactness_mean", "concavity_mean", "concave_points_mean", "symmetry_mean", "fractal_dimension_mean",
+  "radius_se", "texture_se", "perimeter_se", "area_se", "smoothness_se",
+  "compactness_se", "concavity_se", "concave_points_se", "symmetry_se", "fractal_dimension_se",
+  "radius_worst", "texture_worst", "perimeter_worst", "area_worst", "smoothness_worst",
+  "compactness_worst", "concavity_worst", "concave_points_worst", "symmetry_worst", "fractal_dimension_worst"
+)
+head(df)
+```
+
+1. Goal of the prediction task
+
+
+
+2. Description of the dataset (source, study design, population, size of data (nxp), missing values)
+
+3. A summary of the methods you use for the rpediction task
+
+4. The results of building a prediction model or models, including evaluation of model or models, including evaluation of model performance
+
+5. discussion/conclusions
+
