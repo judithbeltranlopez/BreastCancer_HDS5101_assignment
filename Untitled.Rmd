@@ -50,7 +50,40 @@ size_of_available_data
 
 3. A summary of the methods you use for the prediction task
 
+*1. Logistic regression:* fit a standard binary logistic model to estimate the probability that the breast mass is malignant.
+
+*2. LASSO:* fit a penalised logistic regression model with an L1 penalty to shrink coefficients and perform automatic variable selection; choose the penalty parameter using cross-validation.
+
+*3. Naive Bayes:* use a probabilistic classifier for continuous predictors, modelling each predictor within each class and combining them under the conditional independence assumption.
+
+*4. Linear Discrimination Analysis (LDA):* fit a generative classifier that assumes predictors are approximately normally distributed within each class and derives class probabilities using Bayes' theorem.
+
 4. The results of building a prediction model or models, including evaluation of model or models, including evaluation of model performance
+
+### Split data into train/test:
+
+```{r}
+```
+
+### Model 1: Logistic regression
+
+```{r}
+```
+
+### Model 2: LASSO
+
+```{r}
+```
+
+### Model 3: Naive Bayes
+
+```{r}
+```
+
+### Model 4: LDA
+
+```{r}
+```
 
 5. discussion/conclusions
 
