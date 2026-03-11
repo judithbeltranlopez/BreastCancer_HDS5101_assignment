@@ -8,6 +8,14 @@ output: html_document
 
 ```{r}
 ## import ##
+library(dplyr)
+library(ggplot2)
+library(ggcorrplot)
+library(pROC)
+library(CalibrationCurves)
+library(glmnet)
+library(e1071)
+library(sjPlot)
 
 ## load data ##
 df <- read.csv("data/wdbc.data", header = FALSE)
@@ -59,6 +67,11 @@ size_of_available_data
 *4. Linear Discrimination Analysis (LDA):* fit a generative classifier that assumes predictors are approximately normally distributed within each class and derives class probabilities using Bayes' theorem.
 
 4. The results of building a prediction model or models, including evaluation of model or models, including evaluation of model performance
+
+### Convert the outcome variable into binary:
+
+```{r}
+```
 
 ### Split data into train/test:
 
