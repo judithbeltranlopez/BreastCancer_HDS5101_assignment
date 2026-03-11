@@ -26,11 +26,29 @@ head(df)
 
 1. Goal of the prediction task
 
-
+With the selected dataset (Breast Cancer Wisconsin), the goal is to develop and evaluate a prediction model that classifies a breast cancer mass as malignant or benign, using the different available predictors to estimate each probability of malignancy and produce a binary classification.
 
 2. Description of the dataset (source, study design, population, size of data (nxp), missing values)
 
-3. A summary of the methods you use for the rpediction task
+- *Source:* Breast Cancer Wisconsin, https://archive.ics.uci.edu/dataset/17/breast%2Bcancer%2Bwisconsin%2Bdiagnostic
+
+- *Study design:* Observational cross-selectional dataset, each row is a single breast mass assessment based on measurements extracted from an FNA image.
+
+- *Study population:* People with a suspicious breast mass who had a fine needle aspirate (FNA)
+
+- *Size of data (nxp):* we have 569 observations and 32 columns, so our nxp will be 18208. But we have to exclude two columns, since one is our outcome and the other one is an ID column, which is not a predictor so the size of available data is 17070.
+
+```{r}
+size_of_data <- nrow(df)*ncol(df)
+size_of_data
+
+size_of_available_data <- nrow(df)*30
+size_of_available_data
+```
+
+- *Missing values:* There are no missing values in this dataset.
+
+3. A summary of the methods you use for the prediction task
 
 4. The results of building a prediction model or models, including evaluation of model or models, including evaluation of model performance
 
