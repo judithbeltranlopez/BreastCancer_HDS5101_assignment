@@ -189,6 +189,29 @@ lasso_cc
 ### Model 3: Naive Bayes
 
 ```{r}
+# 1. TRAIN MODEL
+nb_model <- naiveBayes(diagnosis~., data=train_df)
+
+# 2. PREDICT
+nb_class <- predict(nb_model, test_df)
+nb_preds <- predict(nb_model, test_df, type="raw")
+
+# 3. BRIER SCORE
+nb_bs <- brier_score(Y_test, nb_preds)
+nb_bs
+
+# 4. CONFUSION MATRIX
+nb_cm <- table(nb_class, Y_test)
+nb_cm
+
+# 5. ROC & AUC
+nb_roc <- roc(Y_test, nb_preds[,2])
+plot(nb_roc, print.auc=TRUE)
+auc(nb_roc)
+
+# 6. CALIBRATION CURVE
+nb_cc <- valProbggplot(nb_preds[,2], Y_test)
+nb_cc
 ```
 
 ### Model 4: LDA
