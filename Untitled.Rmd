@@ -18,6 +18,7 @@ library(e1071)
 library(sjPlot)
 library(MASS)
 library(tree)
+library(caret)
 
 ## load data ##
 df <- read.csv("data/wdbc.data", header = FALSE)
@@ -45,6 +46,11 @@ compute_confusion_matrix <- function(y, pred_prob, thr=0.5){
   pred <- rep(0, length(pred_prob))
   pred[pred_prob>thr] <- 1
   table(pred, y)
+}
+
+misclassification_error <- function(cm){
+  cm <- as.matrix(cm)
+  1 - sum(diag(cm)) / sum(cm)
 }
 ```
 
@@ -109,11 +115,6 @@ train <- runif(n) < 0.7
 
 train_df <- df[train,]
 test_df <- df[!train, ]
-
-X_train <- subset(train_df, select=-diagnosis)
-Y_train <- train_df$diagnosis
-X_test <- subset(test_df, select=-diagnosis)
-Y_test <- test_df$diagnosis
 ```
 
 ### Explore correlation between predictors:
@@ -131,6 +132,23 @@ corr_mat_plot+theme(
   axis.text.x = element_text(size = 7, angle = 45, hjust = 1),
   axis.text.y = element_text(size = 7)
 )
+
+to_drop <- findCorrelation(corr_mat, cutoff = 0.90, names = TRUE)
+to_drop
+```
+
+To reduce redundancy in train data, I will remove predictors with absolute pairwise correlation >0.9, based on the training data correlation matrix. So we need to update the train/test sets.
+
+### Update train/test without found predictors
+
+```{r}
+train_df <- train_df[, !(names(train_df) %in% to_drop)]
+test_df  <- test_df[,  !(names(test_df)  %in% to_drop)]
+
+X_train <- subset(train_df, select=-diagnosis)
+Y_train <- train_df$diagnosis
+X_test <- subset(test_df, select=-diagnosis)
+Y_test <- test_df$diagnosis
 ```
 
 ### Model 1: Logistic regression
@@ -198,9 +216,9 @@ lasso_cm <- compute_confusion_matrix(Y_test, lasso_probs)
 lasso_cm
 
 # 5. ROC & AUC
-roc_lasso <- roc(Y_test, lasso_probs)
-plot(roc_lasso, print.auc=TRUE)
-auc(roc_lasso)
+lasso_roc <- roc(Y_test, lasso_probs)
+plot(lasso_roc, print.auc=TRUE)
+auc(lasso_roc)
 
 # 6. CALIBRATION CURVE
 lasso_cc <- valProbggplot(lasso_probs, Y_test)
@@ -299,3 +317,59 @@ tree_cc
 
 5. discussion/conclusions
 
+```{r}
+comparison_table <- data.frame(
+  Model = c("Logistic Regression", "LASSO", "Naive Bayes", "LDA", "Tree"),
+
+  Brier = c(
+    lr_bs,
+    lasso_bs,
+    nb_bs,
+    lda_bs,
+    tree_bs
+  ),
+
+  Misclass_Error = c(
+    misclassification_error(lr_cm),
+    misclassification_error(lasso_cm),
+    misclassification_error(nb_cm),
+    misclassification_error(lda_cm),
+    misclassification_error(tree_cm)
+  ),
+
+  AUC = c(
+    as.numeric(auc(lr_roc)),
+    as.numeric(auc(lasso_roc)),
+    as.numeric(auc(nb_roc)),
+    as.numeric(auc(lda_roc)),
+    as.numeric(auc(tree_roc))
+  ),
+
+  Cal_Slope = c(
+    as.numeric(lr_cc$stats["Slope"]),
+    as.numeric(lasso_cc$stats["Slope"]),
+    as.numeric(nb_cc$stats["Slope"]),
+    as.numeric(lda_cc$stats["Slope"]),
+    as.numeric(tree_cc$stats["Slope"])
+  )
+)
+
+comparison_table
+```
+
+```{r}
+# logistic regression
+plot(lr_roc, type = "s", col="green")   
+
+# LASSO
+lines(lasso_roc,   type = "s", col = "red")
+
+# Naive Bayes
+lines(nb_roc, type = "s", col = "blue")  
+
+# LDA
+lines(lda_roc, type = "s", col = "orange")  
+
+# Trees
+lines(tree_roc, type = "s", col = "lightblue")  
+```
