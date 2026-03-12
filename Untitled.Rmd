@@ -329,7 +329,7 @@ comparison_table <- data.frame(
     tree_bs
   ),
 
-  Misclass_Error = c(
+  MisclassificationError = c(
     misclassification_error(lr_cm),
     misclassification_error(lasso_cm),
     misclassification_error(nb_cm),
@@ -345,7 +345,7 @@ comparison_table <- data.frame(
     as.numeric(auc(tree_roc))
   ),
 
-  Cal_Slope = c(
+  CalibrationSlope = c(
     as.numeric(lr_cc$stats["Slope"]),
     as.numeric(lasso_cc$stats["Slope"]),
     as.numeric(nb_cc$stats["Slope"]),
@@ -356,6 +356,40 @@ comparison_table <- data.frame(
 
 comparison_table
 ```
+
+### Test set performance comparison (errors, AUC, calibration)
+
+* **Best overall model: LASSO**
+
+  * Lowest **Brier score** (0.029) and highest **AUC** (0.995), indicating the best overall probability accuracy and discrimination.
+  * Misclassification error is also low (~0.054), though not the lowest.
+
+* **Lowest misclassification error: Logistic Regression**
+
+  * Lowest **misclassification error** (0.048) at the 0.5 threshold.
+  * However, it has a higher **Brier score** (0.048) and much lower **AUC** (0.949) than LASSO, suggesting weaker ranking/probability performance overall.
+
+* **Naive Bayes: poor probability quality**
+
+  * Very high **Brier score** (0.487) despite a reasonable **AUC** (0.946).
+  * This pattern suggests the predicted probabilities are **poorly calibrated** (also reflected by a very low calibration slope ~0.16).
+
+* **LDA: strong but not best**
+
+  * High **AUC** (0.980) with moderate **Brier score** (0.049) and misclassification error (~0.065).
+  * Competitive performance, but still dominated by LASSO.
+
+* **Tree: acceptable but weaker**
+
+  * Higher **Brier score** (0.061) and misclassification error (~0.071) with **AUC** similar to logistic regression (~0.948).
+  * A single tree likely underfits compared with penalised/linear methods.
+
+* **Calibration slopes**
+
+  * A slope close to **1** is ideal.
+  * Logistic regression (~0.08) and Naive Bayes (~0.16) indicate **substantial miscalibration**.
+  * LASSO (~1.38) suggests calibration is improved but still not perfect; LDA (~0.69) and Tree (~0.84) are closer to 1 than LR/NB.
+
 
 ```{r}
 # logistic regression
@@ -373,3 +407,13 @@ lines(lda_roc, type = "s", col = "orange")
 # Trees
 lines(tree_roc, type = "s", col = "lightblue")  
 ```
+### ROC curve comparison (test set)
+
+* All five ROC curves sit well above the 45° reference line, indicating **good discrimination** for all models (they perform much better than chance).
+* **LASSO (red)** shows the **best discrimination overall**, with the curve closest to the top-left corner across most thresholds (consistent with the highest AUC in your results).
+* **Logistic regression (green)** is also very strong, but sits slightly below LASSO, suggesting **slightly weaker ranking** of malignant vs benign cases.
+* **LDA (orange)** performs well and is close to the top performers, though generally not as consistently high as LASSO/logistic across the full range.
+* **Tree (light blue)** is competitive but tends to be a bit lower than the linear/penalised methods in parts of the curve, consistent with slightly reduced discrimination.
+* **Naive Bayes (blue)** is the weakest of the group on the ROC plot (lower sensitivity for the same specificity in several regions), although it still shows good discrimination overall.
+
+Overall, the ROC plot supports the conclusion that **LASSO provides the best test-set discrimination**, with logistic regression and LDA close behind.
