@@ -148,6 +148,42 @@ lr_cc
 ### Model 2: LASSO
 
 ```{r}
+# 1. TRAIN MODEL
+X_train <- model.matrix(diagnosis~., train_df)[,-1]
+
+set.seed(1)
+cv_lasso <- cv.glmnet(
+  x=X_train,
+  y=Y_train,
+  family="binomial",
+  alpha=1 # <- 1 means LASSO
+)
+
+# 2. PREDICT
+X_test <- model.matrix(diagnosis~., test_df)[,-1]
+lasso_probs <- as.numeric(predict(
+  cv_lasso,
+  newx=X_test,
+  s="lambda.min",
+  type="response"
+))
+
+# 3. BRIER SCORE
+lasso_bs <- brier_score(Y_test, lasso_probs)
+lasso_bs
+
+# 4. CONFUSION MATRIX
+lasso_cm <- compute_confusion_matrix(Y_test, lasso_probs)
+lasso_cm
+
+# 5. ROC & AUC
+roc_lasso <- roc(Y_test, lasso_probs)
+plot(roc_lasso, print.auc=TRUE)
+auc(roc_lasso)
+
+# 6. CALIBRATION CURVE
+lasso_cc <- valProbggplot(lasso_probs, Y_test)
+lasso_cc
 ```
 
 ### Model 3: Naive Bayes
@@ -159,6 +195,8 @@ lr_cc
 
 ```{r}
 ```
+
+### Model 5: Trees
 
 5. discussion/conclusions
 
