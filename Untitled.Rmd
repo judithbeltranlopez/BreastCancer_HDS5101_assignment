@@ -110,8 +110,27 @@ train <- runif(n) < 0.7
 train_df <- df[train,]
 test_df <- df[!train, ]
 
+X_train <- subset(train_df, select=-diagnosis)
 Y_train <- train_df$diagnosis
+X_test <- subset(test_df, select=-diagnosis)
 Y_test <- test_df$diagnosis
+```
+
+### Explore correlation between predictors:
+
+```{r}
+corr_mat <- cor(X_train)
+corr_mat_plot <- ggcorrplot(
+  corr_mat,
+  type="upper",
+  hc.order = TRUE,
+  lab=FALSE
+)
+
+corr_mat_plot+theme(
+  axis.text.x = element_text(size = 7, angle = 45, hjust = 1),
+  axis.text.y = element_text(size = 7)
+)
 ```
 
 ### Model 1: Logistic regression
