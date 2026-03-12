@@ -32,6 +32,20 @@ colnames(df) <- c(
 head(df)
 ```
 
+```{r}
+## AUXILIAR FUNCTIONS ##
+
+brier_score <- function(y, pred_prob) {
+  mean((y - pred_prob)^2)
+}
+
+compute_confusion_matrix <- function(y, pred_prob, thr=0.5){
+  pred <- rep(0, length(pred_prob))
+  pred[pred_prob>thr] <- 1
+  table(pred, y)
+}
+```
+
 1. Goal of the prediction task
 
 With the selected dataset (Breast Cancer Wisconsin), the goal is to develop and evaluate a prediction model that classifies a breast cancer mass as malignant or benign, using the different available predictors to estimate each probability of malignancy and produce a binary classification.
@@ -72,17 +86,63 @@ size_of_available_data
 
 ### Convert the outcome variable into binary:
 
+Code the diagnosis column to binary column: 1=M, 0=B
+
 ```{r}
+# delete id column because is just ID, we won't need it for the assignment
+df <- subset(df, select = -c(id))
+
+df$diagnosis <- ifelse(df$diagnosis=="M",1,0)
+head(df)
 ```
 
 ### Split data into train/test:
 
 ```{r}
+## Split data into train (70%)/ test (30%)
+set.seed(1)
+
+n <- nrow(df)
+train <- runif(n) < 0.7
+
+train_df <- df[train,]
+test_df <- df[!train, ]
+
+Y_train <- train_df$diagnosis
+Y_test <- test_df$diagnosis
 ```
 
 ### Model 1: Logistic regression
 
 ```{r}
+# 1. TRAIN MODEL
+lr_model <- glm(
+  diagnosis ~ .,
+  data = train_df,
+  family = binomial()
+)
+
+summary(lr_model)
+
+# 2. PREDICT
+lr_probs <- predict(lr_model, test_df, type = "response")
+
+# 3. BRIER SCORE
+lr_bs <- brier_score(Y_test, lr_probs)
+lr_bs
+
+# 4. CONFUSION MATRIX
+lr_cm <- compute_confusion_matrix(Y_test, lr_probs)
+lr_cm
+
+# 5. ROC & AUC
+lr_roc <- roc(Y_test, lr_probs)
+plot(lr_roc, print.auc=TRUE)
+auc(lr_roc)
+
+# 6. CALIBRATION CURVE
+lr_cc <- valProbggplot(lr_probs, Y_test)
+lr_cc
 ```
 
 ### Model 2: LASSO
