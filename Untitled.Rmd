@@ -391,21 +391,24 @@ comparison_table
   * LASSO (~1.38) suggests calibration is improved but still not perfect; LDA (~0.69) and Tree (~0.84) are closer to 1 than LR/NB.
 
 
-```{r}
-# logistic regression
-plot(lr_roc, type = "s", col="green")   
+```{r, fig.width=10, fig.height=5, out.width="100%"}
+op <- par(no.readonly = TRUE)
 
-# LASSO
-lines(lasso_roc,   type = "s", col = "red")
+par(fig = c(0, 0.75, 0, 1), mar = c(5, 5, 4, 2) + 0.1, xpd = FALSE)
+plot(lr_roc, type = "s", col = "green", legacy.axes = TRUE)
+lines(lasso_roc, type = "s", col = "red")
+lines(nb_roc,    type = "s", col = "blue")
+lines(lda_roc,   type = "s", col = "orange")
+lines(tree_roc,  type = "s", col = "lightblue")
 
-# Naive Bayes
-lines(nb_roc, type = "s", col = "blue")  
+par(fig = c(0.75, 1, 0, 1), mar = c(0, 0, 0, 0), new = TRUE, xpd = FALSE)
+plot.new()
+legend("center",
+       legend = c("Logistic Regression", "LASSO", "Naive Bayes", "LDA", "Tree"),
+       col    = c("green", "red", "blue", "orange", "lightblue"),
+       lty    = 1, lwd = 2, bty = "n", cex = 0.9)
 
-# LDA
-lines(lda_roc, type = "s", col = "orange")  
-
-# Trees
-lines(tree_roc, type = "s", col = "lightblue")  
+par(op)
 ```
 ### ROC curve comparison (test set)
 
